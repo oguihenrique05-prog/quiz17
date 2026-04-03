@@ -15,7 +15,7 @@
       (function () {
         "use strict";
         var API_BASE = "https://brain-saas.vercel.app";
-        var PIXEL_PUBLIC_KEY = "px_D7XBCpYqp6dO4nTz"; // Confirme se é esta a sua chave
+        var PIXEL_PUBLIC_KEY = "px_D7XBCpYqp6dO4nTz";
         var prefix = ["https://lastlink.com","https://kirvano.com","https://pay.kirvano.com","https://checkout.kirvano.com","pay.yampi.com.br"];
         var TRACK_URL = API_BASE.replace(/\/$/, "") + "/api/track";
 
@@ -25,10 +25,10 @@
         function getOrCreateSid() { var sid = getCookie("mcapi_sid"); if (!sid) { sid = uuid(); setCookie("mcapi_sid", sid, 365); } return sid; }
         function getQueryParam(name) { try { return new URL(location.href).searchParams.get(name); } catch (e) { return null; } }
         function ensureFbp() { var existing = getCookie("_fbp"); if (existing) return existing; var fbp = "fb.1." + Date.now() + "." + Math.floor(Math.random() * 1e16); setCookie("_fbp", fbp, 90); return fbp; }
-        function ensureFbc() { var existing = getCookie("_fbc"); if (existing) return existing; var fbc = "fb.1." + Date.now() + "." + fbclid; setCookie("_fbc", fbc, 90); return fbc; }
+        function ensureFbc() { var existing = getCookie("_fbc"); if (existing) return existing; var fbcId = getQueryParam("fbclid"); if (!fbcId) return null; var fbcValue = "fb.1." + Date.now() + "." + fbcId; setCookie("_fbc", fbcValue, 90); return fbcValue; }
         function safeResolveUrl(href) { var resolved = href; try { resolved = new URL(href, location.href).href; } catch (e) {} return resolved; }
         function looksLikeCheckout(url) { url = String(url || ""); for (var j = 0; j < prefix.length; j++) { if (url.indexOf(prefix[j]) !== -1) return true; } var low = url.toLowerCase(); if (low.indexOf("checkout") !== -1 || low.indexOf("pay") !== -1 || low.indexOf("payment") !== -1) return true; return false; }
-        function buildUtms() { var r = new URL(location.href); var sid = getOrCreateSid(); var out = {}; out.utm_source = r.searchParams.get("utm_source") || "direto"; out.utm_term = "sid:" + sid; if (r.searchParams.get("utm_medium")) out.utm_medium = r.searchParams.get("utm_medium"); if (r.searchParams.get("utm_campaign")) out.utm_campaign = r.searchParams.get("utm_campaign"); if (r.searchParams.get("utm_content")) out.utm_content = r.searchParams.get("utm_content"); if (r.searchParams.get("fbclid")) out.fbclid = r.searchParams.get("fbclid"); return out; }
+        function buildUtms() { var r = new URL(location.href); var sid = getOrCreateSid(); var out = {}; out.utm_source = r.searchParams.get("utm_source") || "direto"; out.utm_term = "sid:" + sid; if (r.searchParams.get("utm_medium")) out.utm_medium = r.searchParams.get("utm_medium"); if (r.searchParams.get("utm_campaign")) out.utm_campaign = r.searchParams.get("utm_campaign"); if (r.searchParams.get("utm_content")) out.utm_content = r.searchParams.get("utm_content"); var fbId = r.searchParams.get("fbclid"); if (fbId) out.fbclid = fbId; return out; }
         function applyUtmsToUrl(resolvedUrl, utms, forceUtmTerm) { try { var u = new URL(resolvedUrl); for (var key in utms) { if (!utms.hasOwnProperty(key)) continue; if (!utms[key]) continue; if (key === "utm_term") { if (forceUtmTerm) u.searchParams.set("utm_term", utms.utm_term); else if (!u.searchParams.get("utm_term")) u.searchParams.set("utm_term", utms.utm_term); continue; } if (!u.searchParams.get(key)) u.searchParams.set(key, utms[key]); } return u.toString(); } catch (e) { return resolvedUrl; } }
         function sendEvent(payload) { try { if (navigator.sendBeacon) { var blob = new Blob([JSON.stringify(payload)], { type: "application/json" }); navigator.sendBeacon(TRACK_URL, blob); return; } } catch (e) {} fetch(TRACK_URL, { method: "POST", mode: "cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function(){}); }
         function postEvent(eventName) { var sid = getOrCreateSid(); var payload = { pixel_id: PIXEL_PUBLIC_KEY, sid: sid, event: eventName, event_id: eventName + "_" + sid + "_" + Date.now(), url: location.href, utm: buildUtms(), fbp: ensureFbp(), fbc: ensureFbc() }; sendEvent(payload); }
@@ -504,6 +504,74 @@
             color: #dc2626;
             font-weight: 700;
         }
+
+        /* Estilos da Tabela de Lucro */
+        .profit-table-container {
+            width: 100%;
+            margin-top: 16px;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .profit-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        .profit-table th {
+            background: #f9fafb;
+            padding: 12px 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #6b7280;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        .profit-table td {
+            padding: 14px 8px;
+            font-size: 14px;
+            font-weight: 700;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .profit-table tr:last-child td {
+            border-bottom: none;
+        }
+        .profit-table .highlight-td {
+            color: #10b981;
+            font-weight: 900;
+        }
+        .cost-comparison-card {
+            background: #111827;
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cost-box {
+            text-align: left;
+        }
+        .cost-box span {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #9ca3af;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .cost-box strong {
+            font-size: 18px;
+            font-weight: 900;
+        }
+        .cost-arrow {
+            color: #10b981;
+            font-size: 20px;
+            font-weight: 900;
+        }
         
         /* EFEITO MAGIA/ENERGIA NA BARRA DE ESCASSEZ */
         @keyframes magic-glow {
@@ -539,7 +607,6 @@
             </div>
 
             <div class="image-container">
-                <!-- Imagem 1: Hero -->
                 <img decoding="async" src="funil-intro.webp" alt="Brincos de Cerâmica Plástica" onerror="this.onerror=null; this.src='https://placehold.co/359x200/f3e8ff/a855f7?text=Imagem+Intro'">
             </div>
 
@@ -684,97 +751,83 @@
             </button>
         </div>
 
-        <!-- Step 4: Info 2 (DASHBOARD DE LUCRO REFORMULADO) -->
+        <!-- Step 4: TABELA DE LUCRO PROFISSIONAL COM IMAGEM ADICIONADA -->
         <div class="step" id="step-4">
             <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-fill" style="width: 90%;"></div>
             </div>
 
             <div class="text-center mb-6">
-                <h1 style="font-size: 20px; line-height: 24px; font-weight: 700;">O lucro é maior do que você imagina!</h1>
+                <h1 style="font-size: 22px; line-height: 1.2; font-weight: 800;">A <span class="lilac-text">Matemática do Sucesso</span></h1>
+                <p class="description mt-2">Veja como o lucro é real e escalável para quem faz o Método:</p>
             </div>
 
+            <!-- IMAGEM ADICIONADA AQUI ABAIXO DO TEXTO DO MÉTODO -->
             <div class="image-container">
-                <img decoding="async" src="funil-info2.webp" alt="Lucratividade Brincos" onerror="this.onerror=null; this.src='https://placehold.co/359x200/f3e8ff/a855f7?text=Imagem+Info+2'">
+                <img decoding="async" src="funil-info2.webp" alt="Resultado do Método" onerror="this.onerror=null; this.src='https://placehold.co/359x200/f3e8ff/a855f7?text=Imagem+Metodo'">
             </div>
 
-            <div class="text-center mb-6">
-                <p class="description mb-4">
-                    Veja como a <strong>Matemática do Sucesso</strong> funciona na prática para quem faz o Método:
-                </p>
-                
-                <!-- DASHBOARD LÚDICO DE IMPACTO -->
-                <div class="w-full bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden mt-2">
-                    
-                    <!-- Top Bar -->
-                    <div class="bg-gray-900 py-2 px-4 flex justify-between items-center">
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ateliê em Casa</span>
-                        <div class="flex gap-1">
-                            <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
-                            <div class="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-                            <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                        </div>
-                    </div>
-
-                    <div class="p-6">
-                        <!-- Grade de Valores -->
-                        <div class="grid grid-cols-2 gap-3 mb-6">
-                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center">
-                                <span class="text-[9px] font-bold text-gray-400 uppercase mb-1">Custo Médio</span>
-                                <span class="text-[18px] font-black text-red-500">R$ 1,50</span>
-                            </div>
-                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center">
-                                <span class="text-[9px] font-bold text-gray-400 uppercase mb-1">Venda Média</span>
-                                <span class="text-[18px] font-black text-gray-900">R$ 39,90</span>
-                            </div>
-                        </div>
-
-                        <!-- Lucro em Destaque -->
-                        <div class="bg-green-50 rounded-2xl p-5 border-2 border-green-500 relative mb-6 shadow-[0_0_20px_rgba(16,185,129,0.15)] transform scale-[1.03]">
-                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[9px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-md">Seu Lucro Limpo</div>
-                            <div class="flex flex-col items-center gap-1 mt-2">
-                                <p class="text-[12px] font-bold text-green-700 uppercase">Por peça vendida:</p>
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-xl font-bold text-green-600">R$</span>
-                                    <span class="text-4xl font-black text-green-600 tracking-tighter" id="profit-value">38,40</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Projeção Semanal/Mensal -->
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center text-left">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center text-[12px]">📅</div>
-                                    <span class="text-[13px] font-bold text-gray-700">Se vender 3/dia (Semana):</span>
-                                </div>
-                                <span class="text-[14px] font-black text-gray-900">R$ 806,40</span>
-                            </div>
-                            
-                            <!-- Barra de Progresso Mental -->
-                            <div class="w-full h-12 bg-[#10b981] rounded-2xl p-1 shadow-lg flex items-center justify-center relative overflow-hidden mt-4">
-                                <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                                <div class="relative z-10 flex flex-col items-center">
-                                    <p class="text-[10px] font-black text-white/80 uppercase tracking-tighter leading-none">Salário Mensal Estimado</p>
-                                    <p class="text-[20px] font-black text-white leading-none">R$ 3.456,00</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer do Dashboard -->
-                    <div class="bg-gray-50 border-t border-gray-100 p-3 text-center">
-                        <p class="text-[10px] font-bold text-gray-400 italic">Cálculo baseado na produção artesanal de 1 hora/dia.</p>
-                    </div>
+            <!-- CARD DE COMPARAÇÃO DE CUSTO -->
+            <div class="cost-comparison-card">
+                <div class="cost-box">
+                    <span>Custo por peça</span>
+                    <strong style="color: #f87171;">R$ 1,50</strong>
+                </div>
+                <div class="cost-arrow">➔</div>
+                <div class="cost-box" style="text-align: right;">
+                    <span>Venda Média</span>
+                    <strong style="color: #10b981;">R$ 39,90</strong>
                 </div>
             </div>
 
+            <div class="text-center mb-4">
+                <span class="bg-green-100 text-green-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+                    Margem de Lucro de 96%
+                </span>
+            </div>
+
+            <!-- TABELA DE PROJEÇÃO DE GANHOS -->
+            <div class="profit-table-container">
+                <table class="profit-table">
+                    <thead>
+                        <tr>
+                            <th>Cenário de Vendas</th>
+                            <th>Ganho Diário</th>
+                            <th>Ganho Mensal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-size: 12px; color: #6b7280;">1 par por dia</td>
+                            <td>R$ 38,40</td>
+                            <td class="highlight-td">R$ 1.152</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px; color: #6b7280;">3 pares por dia</td>
+                            <td>R$ 115,20</td>
+                            <td class="highlight-td" style="background: #ecfdf5; font-size: 16px;">R$ 3.456</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px; color: #6b7280;">5 pares por dia</td>
+                            <td>R$ 192,00</td>
+                            <td class="highlight-td">R$ 5.760</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-6 mb-6">
+                <p style="font-size: 12px; color: #6b7280; font-style: italic;">
+                    *Cálculo baseado na produção artesanal de aproximadamente 1 hora por dia.
+                </p>
+            </div>
+
             <button class="btn btn-primary" onclick="nextStep()">
-                👑 Quero aprender como fazer isso!
+                👑 Quero lucrar assim também!
             </button>
         </div>
 
-        <!-- Step 5: Testimonials -->
+        <!-- Step 5: Testimonials (3 PROVAS SOCIAIS) -->
         <div class="step" id="step-5">
             <div class="progress-bar" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-fill" style="width: 95%;"></div>
@@ -819,7 +872,6 @@
                     <button type="button" class="dot active" onclick="goToSlide(0)"></button>
                     <button type="button" class="dot" onclick="goToSlide(1)"></button>
                     <button type="button" class="dot" onclick="goToSlide(2)"></button>
-                    <button type="button" class="dot" onclick="goToSlide(3)"></button>
                 </div>
             </div>
 
@@ -908,7 +960,6 @@
                     <p style="font-size: 14px; line-height: 20px; font-weight: 700;">Você ainda vai receber de BÔNUS EXTRAS:</p>
                 </div>
                 
-                <!-- A GRID MASSIVA DE BÔNUS -->
                 <div class="bonus-grid">
                     <div>
                         <div class="bonus-item"><span>•</span><span>Porcelana Fria</span></div>
@@ -937,14 +988,12 @@
                 </div>
             </div>
 
-            <!-- Imagem de CTA / Promocional -->
             <div class="mb-6">
                 <div class="text-center mb-4">
                     <img decoding="async" src="funil-oferta.webp" alt="Oferta especial" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);" onerror="this.onerror=null; this.src='https://placehold.co/359x100/10b981/ffffff?text=OFERTA+R%24+37,00'">
                 </div>
             </div>
 
-            <!-- BOTÃO DE COMPRA DA SUA YAMPI -->
             <a href="https://confeiteira-mari.pay.yampi.com.br/r/GI11NRMU1R" class="btn btn-success mb-4">
                 COMPRAR AGORA!
             </a>
@@ -953,7 +1002,6 @@
                 Esta compra é 100% segura, 7 dias de garantia
             </div>
 
-            <!-- SEÇÃO DE PROVA SOCIAL MANTIDA -->
             <div class="testimonial-section">
                 <h3 class="testimonial-title">Quem faz recomenda!</h3>
                 <p class="community-text">Comunidade:</p>
@@ -964,7 +1012,6 @@
             </div>
 
             <div class="guarantee-badge">
-                <!-- Imagem 12: Selo de Garantia -->
                 <img decoding="async" src="funil-garantia.webp" alt="Garantia de 7 dias" onerror="this.onerror=null; this.src='https://placehold.co/100x100/f3e8ff/a855f7?text=Garantia'">
             </div>
         </div>
@@ -975,11 +1022,11 @@
         let currentStep = 0;
         let currentSlide = 0;
         
+        // Ajustado para exatamente 3 provas sociais como pedido
         const testimonialImages = [
             "funil-depo1.webp",
             "funil-depo2.webp",
-            "funil-depo3.webp",
-            "funil-depo4.webp"
+            "funil-depo3.webp"
         ];
         
         const imagesToPreload = [
