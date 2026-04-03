@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz - Brincos de Cerâmica Plástica</title>
+    
+    <!-- Google Font Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- SCRIPT DE RASTREAMENTO ORIGINAL MANTIDO -->
+    <script>
+      (function () {
+        "use strict";
+        var API_BASE = "https://brain-saas.vercel.app";
+        var PIXEL_PUBLIC_KEY = "px_D7XBCpYqp6dO4nTz"; // Confirme se é esta a sua chave
+        var prefix = ["https://lastlink.com","https://kirvano.com","https://pay.kirvano.com","https://checkout.kirvano.com","pay.yampi.com.br"];
+        var TRACK_URL = API_BASE.replace(/\/$/, "") + "/api/track";
+
+        function getCookie(name) { var match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)")); return match ? decodeURIComponent(match[2]) : null; }
+        function setCookie(name, value, days) { var d = new Date(); d.setTime(d.getTime() + (days || 365) * 24 * 60 * 60 * 1000); document.cookie = name + "=" + encodeURIComponent(value) + "; path=/; expires=" + d.toUTCString() + "; SameSite=Lax"; }
+        function uuid() { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) { var r = (Math.random() * 16) | 0; var v = c === "x" ? r : (r & 0x3) | 0x8; return v.toString(16); }); }
+        function getOrCreateSid() { var sid = getCookie("mcapi_sid"); if (!sid) { sid = uuid(); setCookie("mcapi_sid", sid, 365); } return sid; }
+        function getQueryParam(name) { try { return new URL(location.href).searchParams.get(name); } catch (e) { return null; } }
+        function ensureFbp() { var existing = getCookie("_fbp"); if (existing) return existing; var fbp = "fb.1." + Date.now() + "." + Math.floor(Math.random() * 1e16); setCookie("_fbp", fbp, 90); return fbp; }
+        function ensureFbc() { var existing = getCookie("_fbc"); if (existing) return existing; var fbclid = getQueryParam("fbclid"); if (!fbclid) return null; var fbc = "fb.1." + Date.now() + "." + fbclid; setCookie("_fbc", fbc, 90); return fbc; }
+        function safeResolveUrl(href) { var resolved = href; try { resolved = new URL(href, location.href).href; } catch (e) {} return resolved; }
+        function looksLikeCheckout(url) { url = String(url || ""); for (var j = 0; j < prefix.length; j++) { if (url.indexOf(prefix[j]) !== -1) return true; } var low = url.toLowerCase(); if (low.indexOf("checkout") !== -1 || low.indexOf("pay") !== -1 || low.indexOf("payment") !== -1) return true; return false; }
+        function buildUtms() { var r = new URL(location.href); var sid = getOrCreateSid(); var out = {}; out.utm_source = r.searchParams.get("utm_source") || "direto"; out.utm_term = "sid:" + sid; if (r.searchParams.get("utm_medium")) out.utm_medium = r.searchParams.get("utm_medium"); if (r.searchParams.get("utm_campaign")) out.utm_campaign = r.searchParams.get("utm_campaign"); if (r.searchParams.get("utm_content")) out.utm_content = r.searchParams.get("utm_content"); if (r.searchParams.get("fbclid")) out.fbclid = r.searchParams.get("fbclid"); return out; }
+        function applyUtmsToUrl(resolvedUrl, utms, forceUtmTerm) { try { var u = new URL(resolvedUrl); for (var key in utms) { if (!utms.hasOwnProperty(key)) continue; if (!utms[key]) continue; if (key === "utm_term") { if (forceUtmTerm) u.searchParams.set("utm_term", utms.utm_term); else if (!u.searchParams.get("utm_term")) u.searchParams.set("utm_term", utms.utm_term); continue; } if (!u.searchParams.get(key)) u.searchParams.set(key, utms[key]); } return u.toString(); } catch (e) { return resolvedUrl; } }
+        function sendEvent(payload) { try { if (navigator.sendBeacon) { var blob = new Blob([JSON.stringify(payload)], { type: "application/json" }); navigator.sendBeacon(TRACK_URL, blob); return; } } catch (e) {} fetch(TRACK_URL, { method: "POST", mode: "cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function(){}); }
+        function postEvent(eventName) { var sid = getOrCreateSid(); var payload = { pixel_id: PIXEL_PUBLIC_KEY, sid: sid, event: eventName, event_id: eventName + "_" + sid + "_" + Date.now(), url: location.href, utm: buildUtms(), fbp: ensureFbp(), fbc: ensureFbc() }; sendEvent(payload); }
+        function updateLinks() { var utms = buildUtms(); var anchors = document.querySelectorAll("a[href]"); for (var i = 0; i < anchors.length; i++) { var a = anchors[i]; var href = a.getAttribute("href") || ""; if (!href) continue; var resolved = safeResolveUrl(href); if (!looksLikeCheckout(resolved)) continue; a.href = applyUtmsToUrl(resolved, utms, true); } }
+        function init() { ensureFbp(); updateLinks(); postEvent("PageView"); var tries = 0; var t = setInterval(function () { tries++; updateLinks(); if (tries >= 10) clearInterval(t); }, 1000); if (window.MutationObserver) { var mo = new MutationObserver(function () { updateLinks(); }); mo.observe(document.documentElement, { childList: true, subtree: true }); } }
+        document.addEventListener("click", function (e) { var el = e.target; var a = el && el.closest ? el.closest("a") : null; if (!a) return; var href = a.getAttribute("href") || ""; if (!href) return; var resolved = safeResolveUrl(href); if (!looksLikeCheckout(resolved)) return; var utms = buildUtms(); a.href = applyUtmsToUrl(resolved, utms, true); postEvent("InitiateCheckout"); }, true);
+        if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", init); } else { init(); }
+      })();
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle, #fff7fa 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: #111827;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 391px;
+            padding: 0 16px;
+            margin: 20px auto;
+        }
+        
+        .step { display: none; }
+        
+        .step.active {
+            display: block;
+            animation: fadeInSlideUp 0.5s 0.1s ease-out forwards;
+            opacity: 0; 
+        }
+        
+        .step-out {
+            animation: fadeOutSlideUp 0.2s ease-in forwards;
+        }
+
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOutSlideUp {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #f9a8d4;
+            background-image: linear-gradient(-45deg, 
+                rgba(255, 255, 255, 0.2) 25%, 
+                transparent 25%, 
+                transparent 50%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.2) 75%, 
+                transparent 75%, 
+                transparent);
+            background-size: 30px 30px;
+            animation: moveStripes 2s linear infinite;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes moveStripes {
+            from { background-position: 0 0; }
+            to { background-position: 30px 0; }
+        }
+        
+        .text-center { text-align: center; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+        
+        .title {
+            font-size: 28px;
+            line-height: 34px;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+            margin-bottom: 16px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            line-height: 22px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 24px;
+        }
+        
+        .question {
+            font-size: 18px;
+            line-height: 24px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 24px;
+        }
+        
+        .description {
+            font-size: 14px;
+            line-height: 22px;
+            color: #000;
+        }
+        
+        .pink-text { color: #f9a8d4; }
+        
+        .highlight-black, .highlight-green, .highlight-pink {
+            padding: 4px 8px;
+            margin: 2px 0;
+            display: inline;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+            border-radius: 4px;
+        }
+        
+        .highlight-black { background-color: #1f2937; color: white; }
+        .highlight-green { background-color: #10b981; color: white; }
+        .highlight-pink { background-color: #f9a8d4; color: white; }
+        
+        .blue-banner {
+            background-color: #dbeafe;
+            color: #1e40af;
+            text-align: center;
+            padding: 4px 8px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            line-height: 18px;
+            font-weight: 700;
+            border-radius: 12px;
+        }
+        
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            object-fit: cover;
+        }
+        
+        .btn {
+            width: 100%;
+            min-height: 46px;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 16px;
+            line-height: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+        
+        .btn-primary {
+            background-color: #f9a8d4;
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background-color: #f472b6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 114, 182, 0.3);
+        }
+        
+        .btn-success {
+            background-color: #059669;
+            color: white;
+            animation: pulseButton 1.75s infinite ease-in-out;
+        }
+        
+        .btn-success:hover {
+            background-color: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(4, 120, 87, 0.4);
+            animation-play-state: paused;
+        }
+
+        @keyframes pulseButton {
+            0%, 100% { transform: scale(1); box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25); }
+            50% { transform: scale(1.025); box-shadow: 0 8px 24px rgba(4, 120, 87, 0.4); }
+        }
+        
+        .option-btn {
+            width: 100%;
+            background-color: #f5f3ff;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            font-family: 'Inter', inherit;
+            box-shadow: 0 4px 12px 0 rgba(100, 100, 100, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .option-btn:hover {
+            background-color: #ede9fe;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.2);
+        }
+        
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .option-btn.selected {
+            background-color: #ddd6fe;
+            transform: scale(0.98);
+        }
+        
+        .option-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-emoji {
+            font-size: 24px;
+            line-height: 1;
+        }
+        
+        .option-text {
+            font-size: 14px;
+            line-height: 17px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .option-arrow {
+            color: #7c3aed;
+        }
+        
+        .carousel {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .carousel-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .carousel-btn {
+            position: absolute;
+            z-index: 10;
+            width: 36px;
+            height: 36px;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .carousel-btn:hover {
+            background-color: #f9fafb;
+            transform: scale(1.1);
+        }
+        
+        .carousel-btn.prev { left: 0; }
+        .carousel-btn.next { right: 0; }
+        
+        .carousel-image {
+            width: 280px;
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .carousel-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #d1d5db;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            transition: all 0.25s ease;
+        }
+        
+        .dot:hover { background-color: #fbcfe8; }
+        .dot.active {
+            background-color: #f9a8d4;
+            transform: scale(1.25);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #fef3c7;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(146, 64, 14, 0.1);
+        }
+        
+        .badge-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: #92400e;
+        }
+        
+        .benefits-list { margin-bottom: 24px; }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 20px;
+        }
+        
+        .check-icon {
+            color: #059669;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 2px;
+        }
+        
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 8px;
+            margin-bottom: 24px;
+            background: #fffcfd;
+            padding: 16px 12px;
+            border-radius: 12px;
+            border: 1px solid #fce7f3;
+            font-size: 11px;
+            line-height: 1.4;
+            text-align: left;
+        }
+        
+        .bonus-item { 
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            margin-bottom: 8px; 
+            color: #374151;
+            font-weight: 700;
+        }
+
+        .bonus-item span:first-child {
+            color: #ec4899;
+            font-weight: 900;
+        }
+        
+        .pricing-box {
+            border: 2px solid #059669;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .guarantee-text {
+            font-size: 12px;
+            line-height: 16px;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .testimonial-section { margin-bottom: 24px; }
+        
+        .testimonial-title {
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .community-text {
+            text-align: center;
+            font-size: 14px;
+            color: #f9a8d4;
+            margin-bottom: 8px;
+        }
+        
+        .community-name {
+            text-align: center;
+            font-size: 14px;
+            color: #f9a8d4;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .stats-text {
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 16px;
+        }
+        
+        .guarantee-badge { text-align: center; }
+        .guarantee-badge img { max-width: 100px; height: auto; }
+        
+        .green-box {
+            background-color: #dcfce7;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .green-text {
+            font-size: 14px;
+            line-height: 20px;
+            color: #166534;
+        }
+        
+        .urgency-text {
+            text-align: center;
+            font-size: 14px;
+            line-height: 20px;
+            color: #000;
+            margin-bottom: 24px;
+        }
+        
+        .red-text {
+            color: #dc2626;
+            font-weight: 700;
+        }
+        
+        /* EFEITO MAGIA/ENERGIA NA BARRA DE ESCASSEZ */
+        @keyframes magic-glow {
+            0% { background-position: 200% center; box-shadow: 0 0 4px rgba(220, 38, 38, 0.5); }
+            100% { background-position: -200% center; box-shadow: 0 0 12px rgba(239, 68, 68, 0.9); }
+        }
+        .bar-magic {
+            background: linear-gradient(90deg, #dc2626 0%, #f87171 40%, #ffffff 50%, #f87171 60%, #dc2626 100%);
+            background-size: 200% auto;
+            animation: magic-glow 2s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Step 0: Intro -->
+        <div class="step active" id="step-0">
+            <div class="text-center mb-6">
+                <h1 class="title">
+                    <span class="pink-text">Transforme </span>
+                    <span class="highlight-black">CERÂMICA PLÁSTICA</span><br>
+                    <span class="pink-text">em </span>
+                    <span class="highlight-green">VERDADEIROS</span><br>
+                    <span class="highlight-green">BRINCOS</span>
+                    <span class="highlight-green">LUCRATIVOS</span>
+                </h1>
+                <p class="subtitle">
+                    Vou te ensinar a modelagem, acabamento e venda,<br>
+                    <strong>LUCRANDO DE R$ 2.000 A R$ 5.000 POR MÊS</strong><br>
+                    sem sair de casa.
+                </p>
+            </div>
+
+            <div class="image-container">
+                <!-- Imagem 1: Hero -->
+                <img decoding="async" src="funil-intro.webp" alt="Brincos de Cerâmica Plástica" onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Imagem+Intro'">
+            </div>
+
+            <div class="blue-banner">
+                Modelagem + Acabamento + Vendas
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="text-[16px] font-medium text-gray-600 mt-5 leading-relaxed px-4 max-w-[340px] mx-auto">
+                  Descubra o passo a passo para transformar massa simples em <strong>verdadeiros Brincos</strong> que encantam, valorizam e vendem todos os dias.
+                </p>
+            </div>
+
+            <button class="btn btn-primary mb-4" onclick="nextStep()">
+                Quero liberar meu acesso
+            </button>
+
+            <div class="text-center">
+                <p style="font-size: 12px; line-height: 16px; color: #6b7280;">
+                    <strong>Milhares de mulheres já estão lucrando com brincos artesanais.</strong> A próxima história de sucesso pode ser a sua — toque no botão abaixo e descubra.
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 1: Question 1 -->
+        <div class="step" id="step-1">
+            <div class="text-center mb-6">
+                <h1 class="question">
+                    Você já faz <span class="pink-text">Brincos Artesanais</span> pra vender ou esse seria o seu <span class="pink-text">começo</span>?
+                </h1>
+            </div>
+
+            <div class="image-container">
+                <img decoding="async" src="funil-q1.webp" alt="Modelagem Cerâmica Plástica" onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Imagem+Pergunta+1'">
+            </div>
+
+            <div class="text-center mb-4">
+                <p style="font-size: 14px; line-height: 17px; font-weight: 500;">Escolha a opção abaixo</p>
+            </div>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">😍</span>
+                    <span class="option-text">Sim, já vendo acessórios e quero me destacar ainda mais</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">😐</span>
+                    <span class="option-text">Faço artesanato por hobby, mas quero começar a vender</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">🤔</span>
+                    <span class="option-text">Ainda não faço, mas quero aprender algo lucrativo do zero</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </span>
+            </button>
+        </div>
+
+        <!-- Step 2: Question 2 -->
+        <div class="step" id="step-2">
+            <div class="text-center mb-6">
+                <h1 class="question">
+                    Você já viu alguém vendendo brincos com <span class="pink-text">acabamento de boutique</span> na <span class="highlight-pink">SUA CIDADE</span>?
+                </h1>
+            </div>
+
+            <div class="image-container">
+                <img decoding="async" src="funil-q2.webp" alt="Qualidade de Boutique" onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Imagem+Pergunta+2'">
+            </div>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">👑</span>
+                    <span class="option-text">Nunca vi! Quero ser a primeira a vender aqui!</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">😐</span>
+                    <span class="option-text">Vi sim, mas é bem raro encontrar com qualidade.</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </span>
+            </button>
+
+            <button type="button" class="option-btn" onclick="selectOption(this)">
+                <div class="option-content">
+                    <span class="option-emoji">🤔</span>
+                    <span class="option-text">Já vi bastante, mas sei que posso fazer diferente.</span>
+                </div>
+                <span class="option-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </span>
+            </button>
+        </div>
+
+        <!-- Step 3: Info 1 -->
+        <div class="step" id="step-3">
+            <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill" style="width: 75%;"></div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 20px; line-height: 24px; font-weight: 700; margin-bottom: 16px;">
+                    Fazer brincos assim é <span class="highlight-black">muito mais fácil</span> do que você imagina.
+                </h1>
+            </div>
+
+            <div class="image-container">
+                <img decoding="async" src="funil-info1.webp" alt="Facilidade Cerâmica Plástica" onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Imagem+Info+1'">
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description mb-4">
+                    Qualquer pessoa pode fazer, <strong>mesmo sem saber desenhar, tendo suas peças prontas para venda em apenas 30 minutos.</strong>
+                </p>
+                <p class="description">
+                    Eu desenvolvi um passo a passo simples, direto e testado, que ensina exatamente o que você precisa fazer pra transformar um simples pacote de massa em brincos únicos, valorizados e super lucrativos.
+                </p>
+            </div>
+
+            <button class="btn btn-primary" onclick="nextStep()">
+                👑 Quero ver como funciona!
+            </button>
+        </div>
+
+        <!-- Step 4: Info 2 -->
+        <div class="step" id="step-4">
+            <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill" style="width: 90%;"></div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 20px; line-height: 24px; font-weight: 700;">O lucro é maior do que você imagina!</h1>
+            </div>
+
+            <div class="image-container">
+                <img decoding="async" src="funil-info2.webp" alt="Lucratividade Brincos" onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Imagem+Info+2'">
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description mb-4">
+                    <strong>Mesmo sem experiência</strong>, o meu método te ensina a ter essa margem de lucro trabalhando em casa:
+                </p>
+                
+                <!-- QUADRO VISUAL DE LUCRO INJETADO NO QUIZ -->
+                <div class="bg-white border-2 border-[#10b981] rounded-xl p-4 shadow-sm text-left relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-[#10b981] text-white text-[9px] font-black px-3 py-1 rounded-bl-lg uppercase tracking-wider">ALTA MARGEM</div>
+                    
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 mb-2 mt-2">
+                        <span class="text-gray-600 font-bold text-[14px]">Custo por Par:</span>
+                        <span class="font-black text-red-500 text-[16px]">~ R$ 1,50</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 font-bold text-[14px]">Preço de Venda:</span>
+                        <span class="font-black text-[#10b981] text-[22px]">R$ 30 a R$ 50</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="nextStep()">
+                👑 Quero aprender como fazer isso!
+            </button>
+        </div>
+
+        <!-- Step 5: Testimonials -->
+        <div class="step" id="step-5">
+            <div class="progress-bar" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill" style="width: 95%;"></div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 20px; line-height: 24px; font-weight: 700;">Parabéns! Você está no caminho certo.</h1>
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description mb-4">
+                    Milhares de mulheres começaram exatamente como você — com dúvida, curiosidade e vontade de ter a sua própria renda.
+                </p>
+                <p class="description mb-4">
+                    Hoje, muitas delas vendem <strong>todos os dias</strong> e transformaram a cerâmica plástica na <strong>sua principal fonte de renda.</strong>
+                </p>
+                <p class="description">
+                    Veja abaixo os resultados e peças incríveis de mulheres como você.
+                </p>
+            </div>
+
+            <!-- CARROSSEL MANTIDO DA ESTRUTURA DE PORCELANA -->
+            <div class="carousel">
+                <div class="carousel-container">
+                    <button class="carousel-btn prev" onclick="prevSlide()" aria-label="Slide anterior">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="display: block;">
+                            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="carousel-image">
+                        <img decoding="async" id="carousel-img" src="funil-depo1.webp" alt="Depoimento de aluna" onerror="this.onerror=null; this.src='https://placehold.co/280x400/fce7f3/db2777?text=Depoimento+1'">
+                    </div>
+                    
+                    <button class="carousel-btn next" onclick="nextSlide()" aria-label="Próximo slide">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="display: block;">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="carousel-dots">
+                    <button type="button" class="dot active" onclick="goToSlide(0)"></button>
+                    <button type="button" class="dot" onclick="goToSlide(1)"></button>
+                    <button type="button" class="dot" onclick="goToSlide(2)"></button>
+                    <button type="button" class="dot" onclick="goToSlide(3)"></button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="nextStep()">
+                Continuar
+            </button>
+        </div>
+
+        <!-- Step 6: Sales Page -->
+        <div class="step" id="step-6">
+            <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill" style="width: 100%;"></div>
+            </div>
+
+            <div class="text-center mb-4">
+                <div class="badge">
+                    <span style="font-size: 20px;">🎉</span>
+                    <span class="badge-text">PARABÉNS</span>
+                </div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 style="font-size: 18px; line-height: 22px; font-weight: 700; margin-bottom: 8px;">
+                    Seu plano está <span style="color: #059669;">pronto.</span>
+                </h1>
+                <p style="font-size: 14px; line-height: 17px; color: #6b7280;">Leia com atenção</p>
+            </div>
+
+            <div class="text-center mb-6">
+                <p class="description">
+                    🎉 <strong>Parabéns! Você está prestes a aprender como transformar cerâmica plástica em lindos brincos e ganhar muito dinheiro com isso!</strong>
+                </p>
+            </div>
+
+            <div class="green-box">
+                <p class="green-text">
+                    ✅ <strong>E mais:</strong> você foi selecionada para receber nossos gabaritos exclusivos e a planilha que vai te ajudar a precificar e lucrar todos os dias!
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h2 style="font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 16px;">QUAIS BENEFÍCIOS EU VOU TER ?</h2>
+                
+                <div class="benefits-list">
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Acesso ao Treinamento:</strong> Aulas Gravadas + Materiais de Apoio com acesso imediato pelo celular para você assistir de onde estiver.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>A Regra de Ouro dos 3mm:</strong> Aprenda a nivelar e cortar a massa perfeitamente, sem rebarbas ou marcas de dedo.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Paletas de Grife:</strong> Descubra a alquimia para misturar tons de terracota, mostarda e sálvia que encantam as clientes.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Técnicas de Boutique:</strong> Efeitos orgânicos, marmorizados e uso de tecidos para dar textura de acessório caro.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>O Segredo da Cura Rápida:</strong> A técnica exata para finalizar os brincos em apenas 30 minutinhos, deixando-os prontos para venda no mesmo dia.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Acabamento e Vitrificação:</strong> O pulo do gato usando lixas e acetona para dar o brilho espelhado que não descasca.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>15 Modelos Campeões:</strong> Modelos mais pedidos e aprovados no mercado para você ter retorno rápido na sua primeira coleção.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="check-icon">✓</span>
+                        <div><strong>Certificado Oficial:</strong> Receba seu certificado ao concluir o treinamento, atestando o seu nível profissional.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="urgency-text">
+                Restam apenas <span class="red-text">6 vagas</span> para finalizar a última turma promocional.
+            </div>
+
+            <div class="mb-6">
+                <div class="text-center mb-4">
+                    <img decoding="async" src="funil-mockup-vip.webp" alt="Curso Completo Bônus" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);" onerror="this.onerror=null; this.src='https://placehold.co/359x200/fce7f3/db2777?text=Mockup+B%C3%B4nus'">
+                </div>
+
+                <div class="text-center mb-4">
+                    <p style="font-size: 14px; line-height: 20px; font-weight: 700;">Você ainda vai receber de BÔNUS EXTRAS:</p>
+                </div>
+                
+                <!-- A GRID MASSIVA DE BÔNUS (Estratégia de Empilhamento) -->
+                <div class="bonus-grid">
+                    <div>
+                        <div class="bonus-item"><span>•</span><span>Porcelana Fria</span></div>
+                        <div class="bonus-item"><span>•</span><span>Bolsas de Crochê</span></div>
+                        <div class="bonus-item"><span>•</span><span>Joias Botânicas</span></div>
+                        <div class="bonus-item"><span>•</span><span>Velas Aromáticas</span></div>
+                        <div class="bonus-item"><span>•</span><span>Bandejas Jesmonite</span></div>
+                        <div class="bonus-item"><span>•</span><span>Laços Infantis</span></div>
+                        <div class="bonus-item"><span>•</span><span>Macramê Básico</span></div>
+                        <div class="bonus-item"><span>•</span><span>Tiaras Bordadas</span></div>
+                        <div class="bonus-item"><span>•</span><span>Lembrancinhas</span></div>
+                        <div class="bonus-item"><span>•</span><span>Chaveiros Resina</span></div>
+                    </div>
+                    <div>
+                        <div class="bonus-item"><span>•</span><span>Sabonetes Artesanais</span></div>
+                        <div class="bonus-item"><span>•</span><span>Vasos Geométricos</span></div>
+                        <div class="bonus-item"><span>•</span><span>Miçangas e Beads</span></div>
+                        <div class="bonus-item"><span>•</span><span>Pintura em Gesso</span></div>
+                        <div class="bonus-item"><span>•</span><span>Peças em Epóxi</span></div>
+                        <div class="bonus-item"><span>•</span><span>Terços e Japamalas</span></div>
+                        <div class="bonus-item"><span>•</span><span>Decoração em MDF</span></div>
+                        <div class="bonus-item"><span>•</span><span>Caixas Convite</span></div>
+                        <div class="bonus-item"><span>•</span><span>Vendas no Whats</span></div>
+                        <div class="bonus-item"><span>•</span><span>Certificado Oficial</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Imagem de CTA / Promocional -->
+            <div class="mb-6">
+                <div class="text-center mb-4">
+                    <img decoding="async" src="funil-oferta.webp" alt="Oferta especial" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);" onerror="this.onerror=null; this.src='https://placehold.co/359x100/10b981/ffffff?text=OFERTA+R%24+37,00'">
+                </div>
+            </div>
+
+            <!-- BOTÃO DE COMPRA DA SUA YAMPI -->
+            <a href="https://confeiteira-mari.pay.yampi.com.br/r/7H4XDJMZMM" class="btn btn-success mb-4">
+                COMPRAR AGORA!
+            </a>
+
+            <div class="guarantee-text">
+                Esta compra é 100% segura, 7 dias de garantia
+            </div>
+
+            <!-- SEÇÃO DE PROVA SOCIAL MANTIDA -->
+            <div class="testimonial-section">
+                <h3 class="testimonial-title">Quem faz recomenda!</h3>
+                <p class="community-text">Comunidade:</p>
+                <p class="community-name">Brincos de Cerâmica Plástica !</p>
+                <p class="stats-text">
+                    <strong>94%</strong> das alunas <strong>indicam e recomendam</strong> o curso em suas redes sociais e para conhecidas.
+                </p>
+            </div>
+
+            <div class="guarantee-badge">
+                <!-- Imagem 12: Selo de Garantia -->
+                <img decoding="async" src="funil-garantia.webp" alt="Garantia de 7 dias" onerror="this.onerror=null; this.src='https://placehold.co/100x100/fce7f3/db2777?text=Garantia'">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let currentSlide = 0;
+        
+        const testimonialImages = [
+            "funil-depo1.webp",
+            "funil-depo2.webp",
+            "funil-depo3.webp",
+            "funil-depo4.webp"
+        ];
+        
+        const imagesToPreload = [
+            "funil-intro.webp",
+            "funil-q1.webp",
+            "funil-q2.webp",
+            "funil-info1.webp",
+            "funil-info2.webp",
+            "funil-mockup-vip.webp",
+            "funil-oferta.webp",
+            "funil-garantia.webp",
+            ...testimonialImages
+        ];
+        
+        imagesToPreload.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        function nextStep() {
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            if (currentStepEl) {
+                currentStepEl.classList.add('step-out');
+                
+                setTimeout(() => {
+                    currentStepEl.classList.remove('active');
+                    currentStepEl.classList.remove('step-out');
+                    currentStep++;
+                    
+                    const nextStepEl = document.getElementById(`step-${currentStep}`);
+                    if (nextStepEl) {
+                        nextStepEl.classList.add('active');
+                        window.scrollTo(0, 0); 
+                    }
+                }, 200); 
+            }
+        }
+
+        function selectOption(btnElement) {
+            btnElement.classList.add('selected');
+            
+            const parentStep = btnElement.closest('.step');
+            if (parentStep) {
+                parentStep.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                });
+            }
+            
+            nextStep();
+            
+            setTimeout(() => {
+                if (parentStep) {
+                    parentStep.querySelectorAll('.option-btn').forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.cursor = 'pointer';
+                    });
+                }
+                btnElement.classList.remove('selected');
+            }, 500);
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % testimonialImages.length;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + testimonialImages.length) % testimonialImages.length;
+            updateCarousel();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const img = document.getElementById('carousel-img');
+            if (img) {
+                img.onerror = function() { this.src = 'https://placehold.co/280x400/fce7f3/db2777?text=Depoimento'; };
+                img.src = testimonialImages[currentSlide];
+            }
+            
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCarousel();
+        });
+    </script>
+</body>
+</html>
